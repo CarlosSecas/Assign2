@@ -1,0 +1,118 @@
+     1                                  ;****************************************************************************************************************************
+     2                                  ;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers.
+     3                                  ; Copyright (C) 2024  Carlos Secas .          *
+     4                                  ;                                                                                                                           *
+     5                                  ;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License  *
+     6                                  ;version 3 as published by the Free Software Foundation.  This program is distributed in the hope that it will be useful,   *
+     7                                  ;but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See   *
+     8                                  ;the GNU General Public License for more details A copy of the GNU General Public License v3 is available here:             *
+     9                                  ;<https://www.gnu.org/licenses/>.                                                                                           *
+    10                                  ;****************************************************************************************************************************
+    11                                  
+    12                                  
+    13                                  
+    14                                  
+    15                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
+    16                                  ;Author information
+    17                                  ;  Author name: Carlos Secas
+    18                                  ;  Author email: carlosJsecas@csu.fullerton.edu
+    19                                  ;  CWID: 886088269
+    20                                  ;  Class: 240-09 Section 09
+    21                                  ;
+    22                                  ;Program information
+    23                                  ;  Program name: Arrays of floating point numbers
+    24                                  ;  Programming languages: one module in C, six in x86, one in C++, and one in bash
+    25                                  ;  Date program began: 2025-Feb-12
+    26                                  ;  Date of last update: 2025-Feb-19
+    27                                  ;  Files in this program: main.cpp, manager.asm, input_array.asm, output_array.asm, isfloat.asm, sum.asm, swap.asm, sort.c, r.sh.
+    28                                  ;  Testing: Alpha testing completed.  All functions are correct.
+    29                                  ;  Status: Ready for release to customers
+    30                                  ;
+    31                                  ;Purpose
+    32                                  ;  This program takes floating point number inputs from the user and puts them in an array. The array
+    33                                  ;  values are then printed, along with the variance of the numbers.
+    34                                  ;
+    35                                  ;This file:
+    36                                  ;  File name: manager.asm
+    37                                  ;  Language: X86-64
+    38                                  ;  Max page width: 124 columns
+    39                                  ;  Assemble (standard): nasm -f elf64 -l manage.lis -o manager.o manager.asm
+    40                                  ;  Assemble (debug): nasm -f elf64 -gdwarf -l manage.lis -o manager.o manager.asm
+    41                                  ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
+    42                                  ;  Prototype of this function: extern double manager();
+    43                                  ; 
+    44                                  ;
+    45                                  ;
+    46                                  ;
+    47                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
+    48                                  
+    49                                  global sum
+    50                                  extern printf
+    51                                  
+    52                                  segment .text
+    53                                  sum:
+    54                                      ; Backup general-purpose registers
+    55 00000000 55                          push rbp
+    56 00000001 4889E5                      mov rbp, rsp
+    57 00000004 53                          push rbx
+    58 00000005 51                          push rcx
+    59 00000006 52                          push rdx
+    60 00000007 57                          push rdi
+    61 00000008 56                          push rsi
+    62 00000009 4150                        push r8
+    63 0000000B 4151                        push r9
+    64 0000000D 4152                        push r10
+    65 0000000F 4153                        push r11
+    66 00000011 4154                        push r12
+    67 00000013 4155                        push r13
+    68 00000015 4156                        push r14
+    69 00000017 4157                        push r15
+    70 00000019 9C                          pushf
+    71                                  
+    72                                      ; Backup SSE registers
+    73 0000001A 4883EC10                    sub rsp, 16
+    74 0000001E F30F7F3424                  movdqu [rsp], xmm6  ; Save xmm6 (scratch register)
+    75                                  
+    76                                      ; Initialize sum to 0.0
+    77 00000023 660FEFC0                    pxor xmm0, xmm0      ; xmm0 = 0.0 (used to accumulate sum)
+    78 00000027 4989FE                      mov r14, rdi        ; r14 = pointer to my_array
+    79 0000002A 4989F7                      mov r15, rsi        ; r15 = number of elements
+    80 0000002D 4D31ED                      xor r13, r13        ; r13 = loop counter (index)
+    81                                  
+    82                                  sum_loop:
+    83 00000030 4D39FD                      cmp r13, r15        ; Check if we've processed all elements
+    84 00000033 7D0F                        jge sum_done        ; If so, exit loop
+    85                                  
+    86                                      ; Load my_array[r13] into xmm1
+    87 00000035 F3430F7E0CEE                movq xmm1, [r14 + r13 * 8]  
+    88                                  
+    89                                      ; Add to sum
+    90 0000003B F20F58C1                    addsd xmm0, xmm1  
+    91                                  
+    92                                      ; Increment loop counter
+    93 0000003F 49FFC5                      inc r13
+    94 00000042 EBEC                        jmp sum_loop
+    95                                  
+    96                                  sum_done:
+    97                                      ; Restore SSE registers
+    98 00000044 F30F6F3424                  movdqu xmm6, [rsp]
+    99 00000049 4883C410                    add rsp, 16
+   100                                  
+   101                                      ; Restore general-purpose registers
+   102 0000004D 9D                          popf
+   103 0000004E 415F                        pop r15
+   104 00000050 415E                        pop r14
+   105 00000052 415D                        pop r13
+   106 00000054 415C                        pop r12
+   107 00000056 415B                        pop r11
+   108 00000058 415A                        pop r10
+   109 0000005A 4159                        pop r9
+   110 0000005C 4158                        pop r8
+   111 0000005E 5E                          pop rsi
+   112 0000005F 5F                          pop rdi
+   113 00000060 5A                          pop rdx
+   114 00000061 59                          pop rcx
+   115 00000062 5B                          pop rbx
+   116 00000063 5D                          pop rbp
+   117                                  
+   118 00000064 C3                          ret  ; Result is in xmm0

@@ -1,0 +1,23 @@
+     1                                  global swap
+     2                                  
+     3                                  section .text
+     4                                  swap:
+     5                                      ; Backup general-purpose registers
+     6 00000000 55                          push rbp
+     7 00000001 4889E5                      mov rbp, rsp
+     8 00000004 57                          push rdi
+     9 00000005 56                          push rsi
+    10                                  
+    11                                      ; Load memory values into xmm registers
+    12 00000006 F30F7E07                    movq xmm0, [rdi]  ; Load *x into xmm0
+    13 0000000A F30F7E0E                    movq xmm1, [rsi]  ; Load *y into xmm1
+    14                                  
+    15                                      ; Swap the values
+    16 0000000E 660FD60F                    movq [rdi], xmm1  ; Store *y in *x
+    17 00000012 660FD606                    movq [rsi], xmm0  ; Store *x in *y
+    18                                  
+    19                                      ; Restore general-purpose registers
+    20 00000016 5E                          pop rsi
+    21 00000017 5F                          pop rdi
+    22 00000018 5D                          pop rbp
+    23 00000019 C3                          ret
