@@ -1,5 +1,6 @@
 ;****************************************************************************************************************************
-;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers.
+;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed,
+; and displays the sum of the numbers.
 ; Copyright (C) 2025  Carlos Secas.          *
 ;                                                                                                                           *
 ;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License  *
@@ -29,8 +30,8 @@
 ;  Status: Ready for release to customers
 ;
 ;Purpose
-; This program takes floating point number inputs from the user and puts them in an array. 
-; The array values are then printed, and displays the sum of the numbers.
+;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
+;  and sorts the array and displays it.
 ;
 ;This file:
 ;  File name: output_array.asm
@@ -46,86 +47,88 @@
 ;
 ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
 
-global output_array
+;declarations
 
+global output_array
 
 extern printf
 
 
 segment .data
-   float_format db "%.9lf ", 0  ; Format for printing 64-bit floats
-   newline db 10, 0             ; Newline character
+float_format db "%.9lf ", 0 ;format for printing 64-bit floats
+newline db 10, 0 
+
+segment .bss
+;empty
 
 
 segment .text
+
 output_array:
 
 
-   ; Backup general-purpose registers
-   push rbp
-   mov rbp, rsp
-   push rbx
-   push rcx
-   push rdx
-   push rdi
-   push rsi
-   push r8
-   push r9
-   push r10
-   push r11
-   push r12
-   push r13
-   push r14
-   push r15
-   pushf
+;backup GPRs
+push rbp
+mov rbp, rsp
+push rbx
+push rcx
+push rdx
+push rdi
+push rsi
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+pushf
 
 
-   mov r14, rdi  ; r14 = pointer to array (first argument)
-   mov r15, rsi  ; r15 = number of elements (second argument)
-   xor r13, r13  ; r13 = loop index (counter)
+mov r14, rdi  ; r14 = pointer to array (first argument)
+mov r15, rsi  ; r15 = number of elements (second argument)
+xor r13, r13  ; r13 = loop index (counter)
 
 
 output_loop:
-   cmp r13, r15  ; Ensure we don't print more than the valid inputs
-   jge output_done  ; Stop when we've printed `r15` elements
+cmp r13, r15  ; Ensure we don't print more than the valid inputs
+jge output_done  ; Stop when we've printed `r15` elements
+
+; Load current float from array
+movq xmm0, [r14 + r13 * 8]  ; Load my_array[r13] into xmm0
+
+; Print float
+mov rdi, float_format  ; Format string
+mov rax, 1  ; Floating point argument
+call printf
 
 
-   ; Load current float from array
-   movq xmm0, [r14 + r13 * 8]  ; Load my_array[r13] into xmm0
-
-
-
-
-   ; Print float
-   mov rdi, float_format  ; Format string
-   mov rax, 1  ; Floating point argument
-   call printf
-
-
-   inc r13  ; Move to next array element
-   jmp output_loop
+inc r13  ; Move to next array element
+jmp output_loop
 
 
 output_done:
-   ; Print a newline after array output
-   mov rdi, newline
-   call printf
+; Print a newline after array output
+mov rdi, newline
+call printf
 
 
-   ; Restore general-purpose registers
-   popf
-   pop r15
-   pop r14
-   pop r13
-   pop r12
-   pop r11
-   pop r10
-   pop r9
-   pop r8
-   pop rsi
-   pop rdi
-   pop rdx
-   pop rcx
-   pop rbx
-   pop rbp
-   ret
+; Restore general-purpose registers
+popf
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+pop rsi
+pop rdi
+pop rdx
+pop rcx
+pop rbx
+pop rbp
+ret
+;End of the function output ====================================================================

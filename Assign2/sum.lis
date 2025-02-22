@@ -39,80 +39,91 @@
     39                                  ;  Assemble (standard): nasm -f elf64 -l manage.lis -o manager.o manager.asm
     40                                  ;  Assemble (debug): nasm -f elf64 -gdwarf -l manage.lis -o manager.o manager.asm
     41                                  ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
-    42                                  ;  Prototype of this function: extern double manager();
+    42                                  ;  Prototype of this function: extern double sum();
     43                                  ; 
     44                                  ;
     45                                  ;
     46                                  ;
     47                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
     48                                  
-    49                                  global sum
-    50                                  extern printf
-    51                                  
-    52                                  segment .text
-    53                                  sum:
-    54                                      ; Backup general-purpose registers
-    55 00000000 55                          push rbp
-    56 00000001 4889E5                      mov rbp, rsp
-    57 00000004 53                          push rbx
-    58 00000005 51                          push rcx
-    59 00000006 52                          push rdx
-    60 00000007 57                          push rdi
-    61 00000008 56                          push rsi
-    62 00000009 4150                        push r8
-    63 0000000B 4151                        push r9
-    64 0000000D 4152                        push r10
-    65 0000000F 4153                        push r11
-    66 00000011 4154                        push r12
-    67 00000013 4155                        push r13
-    68 00000015 4156                        push r14
-    69 00000017 4157                        push r15
-    70 00000019 9C                          pushf
-    71                                  
-    72                                      ; Backup SSE registers
-    73 0000001A 4883EC10                    sub rsp, 16
-    74 0000001E F30F7F3424                  movdqu [rsp], xmm6  ; Save xmm6 (scratch register)
-    75                                  
-    76                                      ; Initialize sum to 0.0
-    77 00000023 660FEFC0                    pxor xmm0, xmm0      ; xmm0 = 0.0 (used to accumulate sum)
-    78 00000027 4989FE                      mov r14, rdi        ; r14 = pointer to my_array
-    79 0000002A 4989F7                      mov r15, rsi        ; r15 = number of elements
-    80 0000002D 4D31ED                      xor r13, r13        ; r13 = loop counter (index)
-    81                                  
-    82                                  sum_loop:
-    83 00000030 4D39FD                      cmp r13, r15        ; Check if we've processed all elements
-    84 00000033 7D0F                        jge sum_done        ; If so, exit loop
-    85                                  
-    86                                      ; Load my_array[r13] into xmm1
-    87 00000035 F3430F7E0CEE                movq xmm1, [r14 + r13 * 8]  
-    88                                  
-    89                                      ; Add to sum
-    90 0000003B F20F58C1                    addsd xmm0, xmm1  
-    91                                  
-    92                                      ; Increment loop counter
-    93 0000003F 49FFC5                      inc r13
-    94 00000042 EBEC                        jmp sum_loop
-    95                                  
-    96                                  sum_done:
-    97                                      ; Restore SSE registers
-    98 00000044 F30F6F3424                  movdqu xmm6, [rsp]
-    99 00000049 4883C410                    add rsp, 16
-   100                                  
-   101                                      ; Restore general-purpose registers
-   102 0000004D 9D                          popf
-   103 0000004E 415F                        pop r15
-   104 00000050 415E                        pop r14
-   105 00000052 415D                        pop r13
-   106 00000054 415C                        pop r12
-   107 00000056 415B                        pop r11
-   108 00000058 415A                        pop r10
-   109 0000005A 4159                        pop r9
-   110 0000005C 4158                        pop r8
-   111 0000005E 5E                          pop rsi
-   112 0000005F 5F                          pop rdi
-   113 00000060 5A                          pop rdx
-   114 00000061 59                          pop rcx
-   115 00000062 5B                          pop rbx
-   116 00000063 5D                          pop rbp
-   117                                  
-   118 00000064 C3                          ret  ; Result is in xmm0
+    49                                  ;declarations
+    50                                  
+    51                                  global sum
+    52                                  
+    53                                  extern printf
+    54                                  
+    55                                  segment .data
+    56                                  ;empty
+    57                                  
+    58                                  segment .bss
+    59                                  ;empty
+    60                                  
+    61                                  segment .text
+    62                                  
+    63                                  sum:
+    64                                  
+    65                                  ; Backup general-purpose registers
+    66 00000000 55                      push rbp
+    67 00000001 4889E5                  mov rbp, rsp
+    68 00000004 53                      push rbx
+    69 00000005 51                      push rcx
+    70 00000006 52                      push rdx
+    71 00000007 57                      push rdi
+    72 00000008 56                      push rsi
+    73 00000009 4150                    push r8
+    74 0000000B 4151                    push r9
+    75 0000000D 4152                    push r10
+    76 0000000F 4153                    push r11
+    77 00000011 4154                    push r12
+    78 00000013 4155                    push r13
+    79 00000015 4156                    push r14
+    80 00000017 4157                    push r15
+    81 00000019 9C                      pushf
+    82                                  
+    83                                  ; Backup SSE registers
+    84 0000001A 4883EC10                sub rsp, 16
+    85 0000001E F30F7F3424              movdqu [rsp], xmm6  ; Save xmm6 (scratch register)
+    86                                  
+    87                                  ; Initialize sum to 0.0
+    88 00000023 660F57C0                xorpd xmm0, xmm0      ; xmm0 = 0.0 (used to accumulate sum)
+    89 00000027 4989FE                  mov r14, rdi        ; r14 = pointer to my_array
+    90 0000002A 4989F7                  mov r15, rsi        ; r15 = number of elements
+    91 0000002D 4D31ED                  xor r13, r13        ; r13 = loop counter (index)
+    92                                  
+    93                                  sum_loop:
+    94 00000030 4D39FD                  cmp r13, r15        ; Check if we've processed all elements
+    95 00000033 7D0F                    jge sum_done        ; If so, exit loop
+    96                                  
+    97                                  ; Load my_array[r13] into xmm1
+    98 00000035 F3430F7E0CEE            movq xmm1, [r14 + r13 * 8]  
+    99                                  
+   100                                  ; Add to sum
+   101 0000003B F20F58C1                addsd xmm0, xmm1  
+   102                                  
+   103                                  ; Increment loop counter
+   104 0000003F 49FFC5                  inc r13
+   105 00000042 EBEC                    jmp sum_loop
+   106                                  
+   107                                  sum_done:
+   108                                  ; Restore SSE registers
+   109 00000044 F30F6F3424              movdqu xmm6, [rsp]
+   110 00000049 4883C410                add rsp, 16
+   111                                  
+   112                                  ;Restore the GPRs
+   113 0000004D 9D                      popf
+   114 0000004E 415F                    pop r15
+   115 00000050 415E                    pop r14
+   116 00000052 415D                    pop r13
+   117 00000054 415C                    pop r12
+   118 00000056 415B                    pop r11
+   119 00000058 415A                    pop r10
+   120 0000005A 4159                    pop r9
+   121 0000005C 4158                    pop r8
+   122 0000005E 5E                      pop rsi
+   123 0000005F 5F                      pop rdi
+   124 00000060 5A                      pop rdx
+   125 00000061 59                      pop rcx
+   126 00000062 5B                      pop rbx
+   127 00000063 5D                      pop rbp ;Restore rbp to the base of the activation record of the caller program
+   128 00000064 C3                      ret 
+   129                                  ;End of the function sum ====================================================================

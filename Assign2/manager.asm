@@ -1,6 +1,7 @@
 ;****************************************************************************************************************************
-;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers.
-; Copyright (C) 2024  Carlos Secas .          *
+;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
+; and sorts the array and displays it.
+; Copyright (C) 2025  Carlos Secas .          *
 ;                                                                                                                           *
 ;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License  *
 ;version 3 as published by the Free Software Foundation.  This program is distributed in the hope that it will be useful,   *
@@ -29,8 +30,8 @@
 ;  Status: Ready for release to customers
 ;
 ;Purpose
-;  This program takes floating point number inputs from the user and puts them in an array. The array
-;  values are then printed, along with the variance of the numbers.
+;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
+;  and sorts the array and displays it.
 ;
 ;This file:
 ;  File name: manager.asm
@@ -69,7 +70,6 @@ program_msg3 db "After the last input press enter followed by Control+D:", 10,0
 values_stored_in_arr db 10, "These numbers were received and placed into an array", 10,0
 sum_of_arr db 10, "The sum of the inputted numbers is %.9lf", 10,0
 sorted_arr db 10, "This is the array after the sort process completed:", 10,0
-zero_float dq 0.0   ; Define a 64-bit floating point zero
 
 
 segment .bss 
@@ -78,10 +78,11 @@ align 64
 backup_storage_area resb 832
 sum_result resq 1 ; reserve space for 1 floating point #
 
-my_array resq 20 ; <name> <data-type> <size>
+my_array resq 20
 
 
 segment .text
+
 manager:
 
 ;backup GPRs
@@ -124,19 +125,6 @@ mov rdi, program_msg3
 call printf
 
 
-
-; Zero initialize the array before use
-mov rdi, my_array
-mov rcx, 20
-xor rax, rax
-clear_array:
-    mov qword [rdi], rax
-    add rdi, 8
-    loop clear_array
-
-
-
-
 ;Call input array
 mov rdi, my_array
 mov rsi, 20
@@ -162,7 +150,7 @@ mov rdi, my_array
 mov rsi, r13
 call sum
 
-movq [sum_result], xmm0 ; load value xmm0 from sum function into memory location sum_result
+movq [sum_result], xmm0 ; load value xmm0 from sum function into  sum_result
 
 ;Print sum_of_arr and display the result
 mov rdi, sum_of_arr

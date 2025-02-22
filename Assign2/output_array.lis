@@ -29,8 +29,8 @@
     29                                  ;  Status: Ready for release to customers
     30                                  ;
     31                                  ;Purpose
-    32                                  ; This program takes floating point number inputs from the user and puts them in an array. 
-    33                                  ; The array values are then printed, and displays the sum of the numbers.
+    32                                  ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
+    33                                  ;  and sorts the array and displays it.
     34                                  ;
     35                                  ;This file:
     36                                  ;  File name: output_array.asm
@@ -46,88 +46,91 @@
     46                                  ;
     47                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
     48                                  
-    49                                  global output_array
+    49                                  ;declarations
     50                                  
-    51                                  
-    52                                  extern printf
-    53                                  
+    51                                  global output_array
+    52                                  
+    53                                  extern printf
     54                                  
-    55                                  segment .data
-    56 00000000 252E396C662000             float_format db "%.9lf ", 0  ; Format for printing 64-bit floats
-    57 00000007 0A00                       newline db 10, 0             ; Newline character
-    58                                  
+    55                                  
+    56                                  segment .data
+    57 00000000 252E396C662000          float_format db "%.9lf ", 0  ; Format for printing 64-bit floats
+    58 00000007 0A00                    newline db 10, 0 ; Newline character
     59                                  
-    60                                  segment .text
-    61                                  output_array:
+    60                                  
+    61                                  segment .text
     62                                  
-    63                                  
-    64                                     ; Backup general-purpose registers
-    65 00000000 55                         push rbp
-    66 00000001 4889E5                     mov rbp, rsp
-    67 00000004 53                         push rbx
-    68 00000005 51                         push rcx
-    69 00000006 52                         push rdx
-    70 00000007 57                         push rdi
-    71 00000008 56                         push rsi
-    72 00000009 4150                       push r8
-    73 0000000B 4151                       push r9
-    74 0000000D 4152                       push r10
-    75 0000000F 4153                       push r11
-    76 00000011 4154                       push r12
-    77 00000013 4155                       push r13
-    78 00000015 4156                       push r14
-    79 00000017 4157                       push r15
-    80 00000019 9C                         pushf
-    81                                  
-    82                                  
-    83 0000001A 4989FE                     mov r14, rdi  ; r14 = pointer to array (first argument)
-    84 0000001D 4989F7                     mov r15, rsi  ; r15 = number of elements (second argument)
-    85 00000020 4D31ED                     xor r13, r13  ; r13 = loop index (counter)
-    86                                  
-    87                                  
-    88                                  output_loop:
-    89 00000023 4D39FD                     cmp r13, r15  ; Ensure we don't print more than the valid inputs
-    90 00000026 7D1F                       jge output_done  ; Stop when we've printed `r15` elements
-    91                                  
-    92                                  
-    93                                     ; Load current float from array
-    94 00000028 F3430F7E04EE               movq xmm0, [r14 + r13 * 8]  ; Load my_array[r13] into xmm0
-    95                                  
-    96                                  
+    63                                  output_array:
+    64                                  
+    65                                  
+    66                                  ; Backup general-purpose registers
+    67 00000000 55                      push rbp
+    68 00000001 4889E5                  mov rbp, rsp
+    69 00000004 53                      push rbx
+    70 00000005 51                      push rcx
+    71 00000006 52                      push rdx
+    72 00000007 57                      push rdi
+    73 00000008 56                      push rsi
+    74 00000009 4150                    push r8
+    75 0000000B 4151                    push r9
+    76 0000000D 4152                    push r10
+    77 0000000F 4153                    push r11
+    78 00000011 4154                    push r12
+    79 00000013 4155                    push r13
+    80 00000015 4156                    push r14
+    81 00000017 4157                    push r15
+    82 00000019 9C                      pushf
+    83                                  
+    84                                  
+    85 0000001A 4989FE                  mov r14, rdi  ; r14 = pointer to array (first argument)
+    86 0000001D 4989F7                  mov r15, rsi  ; r15 = number of elements (second argument)
+    87 00000020 4D31ED                  xor r13, r13  ; r13 = loop index (counter)
+    88                                  
+    89                                  
+    90                                  output_loop:
+    91 00000023 4D39FD                  cmp r13, r15  ; Ensure we don't print more than the valid inputs
+    92 00000026 7D1F                    jge output_done  ; Stop when we've printed `r15` elements
+    93                                  
+    94                                  
+    95                                  ; Load current float from array
+    96 00000028 F3430F7E04EE            movq xmm0, [r14 + r13 * 8]  ; Load my_array[r13] into xmm0
     97                                  
     98                                  
-    99                                     ; Print float
-   100 0000002E 48BF-                      mov rdi, float_format  ; Format string
-   100 00000030 [0000000000000000] 
-   101 00000038 B801000000                 mov rax, 1  ; Floating point argument
-   102 0000003D E8(00000000)               call printf
-   103                                  
-   104                                  
-   105 00000042 49FFC5                     inc r13  ; Move to next array element
-   106 00000045 EBDC                       jmp output_loop
-   107                                  
-   108                                  
-   109                                  output_done:
-   110                                     ; Print a newline after array output
-   111 00000047 48BF-                      mov rdi, newline
-   111 00000049 [0700000000000000] 
-   112 00000051 E8(00000000)               call printf
-   113                                  
-   114                                  
-   115                                     ; Restore general-purpose registers
-   116 00000056 9D                         popf
-   117 00000057 415F                       pop r15
-   118 00000059 415E                       pop r14
-   119 0000005B 415D                       pop r13
-   120 0000005D 415C                       pop r12
-   121 0000005F 415B                       pop r11
-   122 00000061 415A                       pop r10
-   123 00000063 4159                       pop r9
-   124 00000065 4158                       pop r8
-   125 00000067 5E                         pop rsi
-   126 00000068 5F                         pop rdi
-   127 00000069 5A                         pop rdx
-   128 0000006A 59                         pop rcx
-   129 0000006B 5B                         pop rbx
-   130 0000006C 5D                         pop rbp
-   131 0000006D C3                         ret
+    99                                  
+   100                                  
+   101                                  ; Print float
+   102 0000002E 48BF-                   mov rdi, float_format  ; Format string
+   102 00000030 [0000000000000000] 
+   103 00000038 B801000000              mov rax, 1  ; Floating point argument
+   104 0000003D E8(00000000)            call printf
+   105                                  
+   106                                  
+   107 00000042 49FFC5                  inc r13  ; Move to next array element
+   108 00000045 EBDC                    jmp output_loop
+   109                                  
+   110                                  
+   111                                  output_done:
+   112                                  ; Print a newline after array output
+   113 00000047 48BF-                   mov rdi, newline
+   113 00000049 [0700000000000000] 
+   114 00000051 E8(00000000)            call printf
+   115                                  
+   116                                  
+   117                                  ; Restore general-purpose registers
+   118 00000056 9D                      popf
+   119 00000057 415F                    pop r15
+   120 00000059 415E                    pop r14
+   121 0000005B 415D                    pop r13
+   122 0000005D 415C                    pop r12
+   123 0000005F 415B                    pop r11
+   124 00000061 415A                    pop r10
+   125 00000063 4159                    pop r9
+   126 00000065 4158                    pop r8
+   127 00000067 5E                      pop rsi
+   128 00000068 5F                      pop rdi
+   129 00000069 5A                      pop rdx
+   130 0000006A 59                      pop rcx
+   131 0000006B 5B                      pop rbx
+   132 0000006C 5D                      pop rbp
+   133 0000006D C3                      ret
+   134                                  ;End of the function output ====================================================================

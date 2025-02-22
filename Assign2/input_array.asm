@@ -1,5 +1,6 @@
 ;****************************************************************************************************************************
-;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers.
+;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
+; and sorts the array and displays it.
 ; Copyright (C) 2025  Carlos Secas.          *
 ;                                                                                                                           *
 ;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License  *
@@ -29,8 +30,8 @@
 ;  Status: Ready for release to customers
 ;
 ;Purpose
-; This program takes floating point number inputs from the user and puts them in an array. 
-; The array values are then printed, and displays the sum of the numbers.
+;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
+;  and sorts the array and displays it.
 ;
 ;This file:
 ;  File name: input_array.asm
@@ -48,36 +49,33 @@
 
 ;declarations
 
-
 global input_array
-
 
 extern printf
 
-
 extern scanf
 
-
 extern isfloat
-
 
 extern atof
 
 
 segment .data                
 
-
 invalid_msg db 10, "The last input was invalid and not entered into the array. Try again.", 10,0
 floatformat db "%31s", 0 ; string formating for scanf
 debug_msg db "Debug: Number of inputs = %d", 10, 0
-debug_index_msg db "Debug: Current input index = %d", 10, 0
 
 
 segment .bss 
- align 64
- backup_storage_area resb 832
- buffer resb 32 ; buffer to hold input string
- segment .text
+
+align 64
+backup_storage_area resb 832
+buffer resb 32 ; buffer to hold input string
+
+
+segment .text
+
 input_array:
 
 
@@ -109,47 +107,24 @@ xsave [backup_storage_area]
 ;Store array, elements of array in stable registers
 mov r14, rdi ; r14 = my_array
 mov r15, rsi ; r15 = max allowed elements
-
-
 xor r13, r13 ; r13 = index at 0
-
-
 
 
 topofloop:
 
-
 cmp r13, r15 ; check if index >= size of array
 jge outofloop ; if yes, exit
 
-; Debug: Print current r13 value before scanning input
-    mov rdi, debug_index_msg
-    mov rsi, r13
-    mov rax, 0
-    call printf
-
 
 ;Use floatformat
-mov rdi, floatformat ;pass formatstring
+mov rdi, floatformat 
 mov rsi, buffer ;pass buffer for input
-call scanf ;read user input into buffer
-
-
-
-
-;Check for Ctrl+D *** This was the main reason it kept getting repeated values
-;cmp rax, 0
-;je outofloop
-;cmp rax, -1 ; if scanf returns -1, user pressed ctrl+d
-;je outofloop ; exit input loop
-
+call scanf 
 
 
 ; Check if scanf successfully read a value
-cmp rax, 1         ; scanf should return 1 on success. cannot be 0 why?
-jne outofloop      ; If not 1 (e.g., Ctrl+D or invalid input), exit loop
-
-
+cmp rax, 1         
+jne outofloop ; If not 1 then exit the loop
 
 
 ;Validate input (isfloat)
@@ -164,10 +139,8 @@ mov rdi, buffer
 call atof
 
 
-
-
-cmp r13, r15    ; Ensure we don't write beyond the allocated space
-jge outofloop   ; If we hit max, stop input
+cmp r13, r15 ;compare r13 and r15
+jge outofloop ;if r13 >= r15 then jump to outofloop 
 
 
 movq [r14 + r13 * 8], xmm0 ; store converted float in my_array[r13]
@@ -188,14 +161,7 @@ jmp topofloop
 
 outofloop:
 
-; Debug: Print number of valid inputs
-mov rdi, debug_msg   ; Debug message
-mov rsi, r13         ; Number of inputs
-mov rax, 0           ; No floating point arguments
-call printf
 mov rax, r13 ; return the number of valid inputs
-
-
 
 
 ;Restore the GPRs
@@ -213,8 +179,6 @@ pop rdi
 pop rdx
 pop rcx
 pop rbx
-pop rbp   ;Restore rbp to the base of the activation record of the caller program
+pop rbp ;Restore rbp to the base of the activation record of the caller program
 ret
 ;End of the function input_array ====================================================================
-
-
