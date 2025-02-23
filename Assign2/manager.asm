@@ -33,6 +33,10 @@
 ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
 ;  and sorts the array and displays it.
 ;
+;Devlopment
+;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+;  accessed remotely from a Windows 10 system.  
+;
 ;This file:
 ;  File name: manager.asm
 ;  Language: X86-64
@@ -62,7 +66,7 @@ extern output_array
 extern printf
 
 
-segment .data
+segment .data ;intialized data here
 
 program_msg1 db 10, "This program will manage your arrays of 64-bit floats.", 10,0
 program_msg2 db 10, "For the array enter a sequence of 64-bit floats seperated by white space.", 10,0
@@ -72,13 +76,13 @@ sum_of_arr db 10, "The sum of the inputted numbers is %.9lf", 10,0
 sorted_arr db 10, "This is the array after the sort process completed:", 10,0
 
 
-segment .bss 
+segment .bss ;Declare pointers to un-intialized space here
 
 align 64
 backup_storage_area resb 832
 sum_result resq 1 ; reserve space for 1 floating point #
 
-my_array resq 20
+my_array resq 20 ; array for floating point #'s
 
 
 segment .text
@@ -174,7 +178,8 @@ mov rdi, my_array
 mov rsi, r13
 call output_array
 
-movsd xmm0, [sum_result] ; load sum back into xmm0
+; load sum back into xmm0 for printing the value
+movsd xmm0, [sum_result] 
 
 
 ;Restore the GPRs

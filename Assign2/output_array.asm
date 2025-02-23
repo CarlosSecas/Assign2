@@ -33,6 +33,10 @@
 ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
 ;  and sorts the array and displays it.
 ;
+;Devlopment
+;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+;  accessed remotely from a Windows 10 system.  
+;
 ;This file:
 ;  File name: output_array.asm
 ;  Language: X86-64
@@ -40,7 +44,7 @@
 ;  Assemble (standard): nasm -f elf64 -l output.lis -o output.o output_array.asm
 ;  Assemble (debug): nasm -f elf64 -gdwarf -l output.lis -o output.o output_array.asm
 ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
-;  Prototype of this function: extern double output_array();
+;  Prototype of this function: extern void output_array();
 ; 
 ;
 ;

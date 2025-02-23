@@ -25,6 +25,9 @@
 
 //Purpose of this program: This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, along with the variance of the numbers.
 //  
+//  This C++ code was developed in a Linux-based enviorment within Github Codespaces,
+//  accessed remotely from a Windows 10 system.  
+//
 //This file
 //  File name: sort.c
 //  Language: C language, 202x standardization where x will be a decimal digit.

@@ -33,167 +33,171 @@
     33                                  ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
     34                                  ;  and sorts the array and displays it.
     35                                  ;
-    36                                  ;This file:
-    37                                  ;  File name: input_array.asm
-    38                                  ;  Language: X86-64
-    39                                  ;  Max page width: 124 columns
-    40                                  ;  Assemble (standard): nasm -f elf64 -l input.lis -o input.o input_array.asm
-    41                                  ;  Assemble (debug): nasm -f elf64 -gdwarf -l input.lis -o input.o input_array.asm
-    42                                  ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
-    43                                  ;  Prototype of this function: extern double input_array();
-    44                                  ; 
-    45                                  ;
-    46                                  ;
-    47                                  ;
-    48                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
-    49                                  
-    50                                  ;declarations
-    51                                  
-    52                                  global input_array
+    36                                  ;Devlopment
+    37                                  ;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+    38                                  ;  accessed remotely from a Windows 10 system.  
+    39                                  ;
+    40                                  ;This file:
+    41                                  ;  File name: input_array.asm
+    42                                  ;  Language: X86-64
+    43                                  ;  Max page width: 124 columns
+    44                                  ;  Assemble (standard): nasm -f elf64 -l input.lis -o input.o input_array.asm
+    45                                  ;  Assemble (debug): nasm -f elf64 -gdwarf -l input.lis -o input.o input_array.asm
+    46                                  ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
+    47                                  ;  Prototype of this function: extern double input_array();
+    48                                  ; 
+    49                                  ;
+    50                                  ;
+    51                                  ;
+    52                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
     53                                  
-    54                                  extern printf
+    54                                  ;declarations
     55                                  
-    56                                  extern scanf
+    56                                  global input_array
     57                                  
-    58                                  extern isfloat
+    58                                  extern printf
     59                                  
-    60                                  extern atof
+    60                                  extern scanf
     61                                  
-    62                                  
-    63                                  segment .data                
-    64                                  
-    65 00000000 0A546865206C617374-     invalid_msg db 10, "The last input was invalid and not entered into the array. Try again.", 10,0
-    65 00000009 20696E707574207761-
-    65 00000012 7320696E76616C6964-
-    65 0000001B 20616E64206E6F7420-
-    65 00000024 656E74657265642069-
-    65 0000002D 6E746F207468652061-
-    65 00000036 727261792E20547279-
-    65 0000003F 20616761696E2E0A00 
-    66 00000048 2533317300              floatformat db "%31s", 0 ; string formating for scanf
-    67 0000004D 44656275673A204E75-     debug_msg db "Debug: Number of inputs = %d", 10, 0
-    67 00000056 6D626572206F662069-
-    67 0000005F 6E70757473203D2025-
-    67 00000068 640A00             
+    62                                  extern isfloat
+    63                                  
+    64                                  extern atof
+    65                                  
+    66                                  
+    67                                  segment .data ;Place initialized data here             
     68                                  
-    69                                  
-    70                                  segment .bss 
-    71                                  
-    72                                  align 64
-    73 00000000 <res 00000340>          backup_storage_area resb 832
-    74 00000340 <res 00000020>          buffer resb 32 ; buffer to hold input string
+    69 00000000 0A546865206C617374-     invalid_msg db 10, "The last input was invalid and not entered into the array. Try again.", 10,0
+    69 00000009 20696E707574207761-
+    69 00000012 7320696E76616C6964-
+    69 0000001B 20616E64206E6F7420-
+    69 00000024 656E74657265642069-
+    69 0000002D 6E746F207468652061-
+    69 00000036 727261792E20547279-
+    69 0000003F 20616761696E2E0A00 
+    70 00000048 2533317300              floatformat db "%31s", 0 ; string formating for scanf
+    71 0000004D 44656275673A204E75-     debug_msg db "Debug: Number of inputs = %d", 10, 0
+    71 00000056 6D626572206F662069-
+    71 0000005F 6E70757473203D2025-
+    71 00000068 640A00             
+    72                                  
+    73                                  
+    74                                  segment .bss ;Declare pointers to un-initialized space in this segment.
     75                                  
-    76                                  
-    77                                  segment .text
-    78                                  
-    79                                  input_array:
+    76                                  align 64
+    77 00000000 <res 00000340>          backup_storage_area resb 832
+    78 00000340 <res 00000020>          buffer resb 32 ; buffer to hold input string
+    79                                  
     80                                  
-    81                                  
-    82                                  ;backup GPRs
-    83 00000000 55                      push rbp
-    84 00000001 4889E5                  mov rbp, rsp
-    85 00000004 53                      push rbx
-    86 00000005 51                      push rcx
-    87 00000006 52                      push rdx
-    88 00000007 57                      push rdi
-    89 00000008 56                      push rsi
-    90 00000009 4150                    push r8
-    91 0000000B 4151                    push r9
-    92 0000000D 4152                    push r10
-    93 0000000F 4153                    push r11
-    94 00000011 4154                    push r12
-    95 00000013 4155                    push r13
-    96 00000015 4156                    push r14
-    97 00000017 4157                    push r15
-    98 00000019 9C                      pushf
-    99                                  
-   100                                  
-   101                                  ;backup other registers/sse registers
-   102 0000001A B807000000              mov rax,7
-   103 0000001F BA00000000              mov rdx,0
-   104 00000024 0FAE2425[00000000]      xsave [backup_storage_area]
-   105                                  
-   106                                  
-   107                                  ;Store array, elements of array in stable registers
-   108 0000002C 4989FE                  mov r14, rdi ; r14 = my_array
-   109 0000002F 4989F7                  mov r15, rsi ; r15 = max allowed elements
-   110 00000032 4D31ED                  xor r13, r13 ; r13 = index at 0
-   111                                  
-   112                                  
-   113                                  topofloop:
-   114                                  
-   115 00000035 4D39FD                  cmp r13, r15 ; check if index >= size of array
-   116 00000038 7D6C                    jge outofloop ; if yes, exit
-   117                                  
+    81                                  segment .text
+    82                                  
+    83                                  input_array:
+    84                                  
+    85                                  
+    86                                  ;backup GPRs
+    87 00000000 55                      push rbp
+    88 00000001 4889E5                  mov rbp, rsp
+    89 00000004 53                      push rbx
+    90 00000005 51                      push rcx
+    91 00000006 52                      push rdx
+    92 00000007 57                      push rdi
+    93 00000008 56                      push rsi
+    94 00000009 4150                    push r8
+    95 0000000B 4151                    push r9
+    96 0000000D 4152                    push r10
+    97 0000000F 4153                    push r11
+    98 00000011 4154                    push r12
+    99 00000013 4155                    push r13
+   100 00000015 4156                    push r14
+   101 00000017 4157                    push r15
+   102 00000019 9C                      pushf
+   103                                  
+   104                                  
+   105                                  ;backup other registers/sse registers
+   106 0000001A B807000000              mov rax,7
+   107 0000001F BA00000000              mov rdx,0
+   108 00000024 0FAE2425[00000000]      xsave [backup_storage_area]
+   109                                  
+   110                                  
+   111                                  ;Store array, elements of array in stable registers
+   112 0000002C 4989FE                  mov r14, rdi ; r14 = my_array
+   113 0000002F 4989F7                  mov r15, rsi ; r15 = max allowed elements
+   114 00000032 4D31ED                  xor r13, r13 ; r13 = index at 0
+   115                                  
+   116                                  
+   117                                  topofloop:
    118                                  
-   119                                  ;Use floatformat
-   120 0000003A 48BF-                   mov rdi, floatformat 
-   120 0000003C [4800000000000000] 
-   121 00000044 48BE-                   mov rsi, buffer ;pass buffer for input
-   121 00000046 [4003000000000000] 
-   122 0000004E E8(00000000)            call scanf 
-   123                                  
-   124                                  
-   125                                  ; Check if scanf successfully read a value
-   126 00000053 4883F801                cmp rax, 1         
-   127 00000057 754D                    jne outofloop ; If not 1 then exit the loop
+   119 00000035 4D39FD                  cmp r13, r15 ; check if index >= size of array
+   120 00000038 7D6C                    jge outofloop ; if yes, exit
+   121                                  
+   122                                  
+   123                                  ;Use floatformat
+   124 0000003A 48BF-                   mov rdi, floatformat 
+   124 0000003C [4800000000000000] 
+   125 00000044 48BE-                   mov rsi, buffer ;pass buffer for input
+   125 00000046 [4003000000000000] 
+   126 0000004E E8(00000000)            call scanf 
+   127                                  
    128                                  
-   129                                  
-   130                                  ;Validate input (isfloat)
-   131 00000059 48BF-                   mov rdi, buffer ; pass input string to isfloat
-   131 0000005B [4003000000000000] 
-   132 00000063 E8(00000000)            call isfloat
-   133 00000068 4883F800                cmp rax, 0 ; check if rax == rax
-   134 0000006C 741F                    je invalid_input ; if rax == 0, jump to invalid_input
-   135                                  
-   136                                  
-   137                                  ;Convert string to float using atof
-   138 0000006E 48BF-                   mov rdi, buffer
-   138 00000070 [4003000000000000] 
-   139 00000078 E8(00000000)            call atof
+   129                                  ; Check if scanf successfully read a value
+   130 00000053 4883F801                cmp rax, 1         
+   131 00000057 754D                    jne outofloop ; If not 1 then exit the loop
+   132                                  
+   133                                  
+   134                                  ;Validate input (isfloat)
+   135 00000059 48BF-                   mov rdi, buffer ; pass input string to isfloat
+   135 0000005B [4003000000000000] 
+   136 00000063 E8(00000000)            call isfloat
+   137 00000068 4883F800                cmp rax, 0 ; check if rax == rax
+   138 0000006C 741F                    je invalid_input ; if rax == 0, jump to invalid_input
+   139                                  
    140                                  
-   141                                  
-   142 0000007D 4D39FD                  cmp r13, r15    ; Ensure we don't write beyond the allocated space
-   143 00000080 7D24                    jge outofloop   ; If we hit max, stop input
+   141                                  ;Convert string to float using atof
+   142 0000006E 48BF-                   mov rdi, buffer
+   142 00000070 [4003000000000000] 
+   143 00000078 E8(00000000)            call atof
    144                                  
    145                                  
-   146 00000082 66430FD604EE            movq [r14 + r13 * 8], xmm0 ; store converted float in my_array[r13]
-   147 00000088 49FFC5                  inc r13 ; increment valid input count
+   146 0000007D 4D39FD                  cmp r13, r15 ;compare r13 and r15
+   147 00000080 7D24                    jge outofloop ;if r13 >= r15 then jump to outofloop 
    148                                  
    149                                  
-   150 0000008B EBA8                    jmp topofloop ;repeat loop
-   151                                  
+   150 00000082 66430FD604EE            movq [r14 + r13 * 8], xmm0 ; store converted float in my_array[r13]
+   151 00000088 49FFC5                  inc r13 ; increment valid input count
    152                                  
-   153                                  invalid_input:
-   154                                  
+   153                                  
+   154 0000008B EBA8                    jmp topofloop ;repeat loop
    155                                  
-   156 0000008D 48BF-                   mov rdi, invalid_msg
-   156 0000008F [0000000000000000] 
-   157 00000097 E8(00000000)            call printf
-   158 0000009C C60425[40030000]00      mov byte [buffer], 0 ; Clear buffer to ensure fesh input
-   159 000000A4 EB8F                    jmp topofloop
-   160                                  
-   161                                  
-   162                                  outofloop:
-   163                                  
-   164 000000A6 4C89E8                  mov rax, r13 ; return the number of valid inputs
+   156                                  
+   157                                  invalid_input:
+   158                                  
+   159                                  ;Print invalid_msg for invalid entry 
+   160 0000008D 48BF-                   mov rdi, invalid_msg
+   160 0000008F [0000000000000000] 
+   161 00000097 E8(00000000)            call printf
+   162 0000009C C60425[40030000]00      mov byte [buffer], 0 ; Clear buffer to ensure fesh input
+   163 000000A4 EB8F                    jmp topofloop
+   164                                  
    165                                  
-   166                                  
-   167                                  ;Restore the GPRs
-   168 000000A9 9D                      popf
-   169 000000AA 415F                    pop r15
-   170 000000AC 415E                    pop r14
-   171 000000AE 415D                    pop r13
-   172 000000B0 415C                    pop r12
-   173 000000B2 415B                    pop r11
-   174 000000B4 415A                    pop r10
-   175 000000B6 4159                    pop r9
-   176 000000B8 4158                    pop r8
-   177 000000BA 5E                      pop rsi
-   178 000000BB 5F                      pop rdi
-   179 000000BC 5A                      pop rdx
-   180 000000BD 59                      pop rcx
-   181 000000BE 5B                      pop rbx
-   182 000000BF 5D                      pop rbp ;Restore rbp to the base of the activation record of the caller program
-   183 000000C0 C3                      ret
-   184                                  ;End of the function input_array ====================================================================
+   166                                  outofloop:
+   167                                  
+   168 000000A6 4C89E8                  mov rax, r13 ; return the number of valid inputs
+   169                                  
+   170                                  
+   171                                  ;Restore the GPRs
+   172 000000A9 9D                      popf
+   173 000000AA 415F                    pop r15
+   174 000000AC 415E                    pop r14
+   175 000000AE 415D                    pop r13
+   176 000000B0 415C                    pop r12
+   177 000000B2 415B                    pop r11
+   178 000000B4 415A                    pop r10
+   179 000000B6 4159                    pop r9
+   180 000000B8 4158                    pop r8
+   181 000000BA 5E                      pop rsi
+   182 000000BB 5F                      pop rdi
+   183 000000BC 5A                      pop rdx
+   184 000000BD 59                      pop rcx
+   185 000000BE 5B                      pop rbx
+   186 000000BF 5D                      pop rbp ;Restore rbp to the base of the activation record of the caller program
+   187 000000C0 C3                      ret
+   188                                  ;End of the function input_array ====================================================================

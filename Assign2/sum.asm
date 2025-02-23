@@ -33,6 +33,10 @@
 ; This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
 ; and sorts the array and displays it.
 ;
+;Devlopment
+;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+;  accessed remotely from a Windows 10 system.  
+;
 ;This file:
 ;  File name: sum.asm
 ;  Language: X86-64
@@ -81,9 +85,6 @@ push r14
 push r15
 pushf
 
-;backup SSE registers
-sub rsp, 16
-movdqu [rsp], xmm6  ; save xmm6 
 
 ;initialize sum to 0.0
 xorpd xmm0, xmm0 ; initialize xmm0 to zero
@@ -107,9 +108,6 @@ jmp sum_loop
 
 sum_done:
 
-;restore SSE registers
-movdqu xmm6, [rsp]
-add rsp, 16
 
 ;Restore the GPRs
 popf

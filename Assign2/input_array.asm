@@ -33,6 +33,10 @@
 ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
 ;  and sorts the array and displays it.
 ;
+;Devlopment
+;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+;  accessed remotely from a Windows 10 system.  
+;
 ;This file:
 ;  File name: input_array.asm
 ;  Language: X86-64
@@ -60,14 +64,14 @@ extern isfloat
 extern atof
 
 
-segment .data                
+segment .data ;Place initialized data here             
 
 invalid_msg db 10, "The last input was invalid and not entered into the array. Try again.", 10,0
 floatformat db "%31s", 0 ; string formating for scanf
 debug_msg db "Debug: Number of inputs = %d", 10, 0
 
 
-segment .bss 
+segment .bss ;Declare pointers to un-initialized space in this segment.
 
 align 64
 backup_storage_area resb 832
@@ -152,7 +156,7 @@ jmp topofloop ;repeat loop
 
 invalid_input:
 
-
+;Print invalid_msg for invalid entry 
 mov rdi, invalid_msg
 call printf
 mov byte [buffer], 0 ; Clear buffer to ensure fesh input

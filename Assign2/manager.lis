@@ -1,7 +1,7 @@
      1                                  ;****************************************************************************************************************************
      2                                  ;Program name: "Arrays of floating point numbers".  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
      3                                  ; and sorts the array and displays it.
-     4                                  ; Copyright (C) 2024  Carlos Secas .          *
+     4                                  ; Copyright (C) 2025  Carlos Secas .          *
      5                                  ;                                                                                                                           *
      6                                  ;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License  *
      7                                  ;version 3 as published by the Free Software Foundation.  This program is distributed in the hope that it will be useful,   *
@@ -33,214 +33,219 @@
     33                                  ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
     34                                  ;  and sorts the array and displays it.
     35                                  ;
-    36                                  ;This file:
-    37                                  ;  File name: manager.asm
-    38                                  ;  Language: X86-64
-    39                                  ;  Max page width: 124 columns
-    40                                  ;  Assemble (standard): nasm -f elf64 -l manage.lis -o manager.o manager.asm
-    41                                  ;  Assemble (debug): nasm -f elf64 -gdwarf -l manage.lis -o manager.o manager.asm
-    42                                  ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
-    43                                  ;  Prototype of this function: extern double manager();
-    44                                  ; 
-    45                                  ;
-    46                                  ;
-    47                                  ;
-    48                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
-    49                                  
-    50                                  ;declarations
-    51                                  
-    52                                  global manager
+    36                                  ;Devlopment
+    37                                  ;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+    38                                  ;  accessed remotely from a Windows 10 system.  
+    39                                  ;
+    40                                  ;This file:
+    41                                  ;  File name: manager.asm
+    42                                  ;  Language: X86-64
+    43                                  ;  Max page width: 124 columns
+    44                                  ;  Assemble (standard): nasm -f elf64 -l manage.lis -o manager.o manager.asm
+    45                                  ;  Assemble (debug): nasm -f elf64 -gdwarf -l manage.lis -o manager.o manager.asm
+    46                                  ;  Optimal print specification: Landscape, 7 points, monospace, 8½x11 paper
+    47                                  ;  Prototype of this function: extern double manager();
+    48                                  ; 
+    49                                  ;
+    50                                  ;
+    51                                  ;
+    52                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
     53                                  
-    54                                  extern input_array
+    54                                  ;declarations
     55                                  
-    56                                  extern sum
+    56                                  global manager
     57                                  
-    58                                  extern sort
+    58                                  extern input_array
     59                                  
-    60                                  extern output_array
+    60                                  extern sum
     61                                  
-    62                                  extern printf
+    62                                  extern sort
     63                                  
-    64                                  
-    65                                  segment .data
-    66                                  
-    67 00000000 0A546869732070726F-     program_msg1 db 10, "This program will manage your arrays of 64-bit floats.", 10,0
-    67 00000009 6772616D2077696C6C-
-    67 00000012 206D616E6167652079-
-    67 0000001B 6F7572206172726179-
-    67 00000024 73206F662036342D62-
-    67 0000002D 697420666C6F617473-
-    67 00000036 2E0A00             
-    68 00000039 0A466F722074686520-     program_msg2 db 10, "For the array enter a sequence of 64-bit floats seperated by white space.", 10,0
-    68 00000042 617272617920656E74-
-    68 0000004B 657220612073657175-
-    68 00000054 656E6365206F662036-
-    68 0000005D 342D62697420666C6F-
-    68 00000066 617473207365706572-
-    68 0000006F 617465642062792077-
-    68 00000078 686974652073706163-
-    68 00000081 652E0A00           
-    69 00000085 416674657220746865-     program_msg3 db "After the last input press enter followed by Control+D:", 10,0
-    69 0000008E 206C61737420696E70-
-    69 00000097 757420707265737320-
-    69 000000A0 656E74657220666F6C-
-    69 000000A9 6C6F77656420627920-
-    69 000000B2 436F6E74726F6C2B44-
-    69 000000BB 3A0A00             
-    70 000000BE 0A5468657365206E75-     values_stored_in_arr db 10, "These numbers were received and placed into an array", 10,0
-    70 000000C7 6D6265727320776572-
-    70 000000D0 652072656365697665-
-    70 000000D9 6420616E6420706C61-
-    70 000000E2 63656420696E746F20-
-    70 000000EB 616E2061727261790A-
-    70 000000F4 00                 
-    71 000000F5 0A5468652073756D20-     sum_of_arr db 10, "The sum of the inputted numbers is %.9lf", 10,0
-    71 000000FE 6F662074686520696E-
-    71 00000107 707574746564206E75-
-    71 00000110 6D6265727320697320-
-    71 00000119 252E396C660A00     
-    72 00000120 0A5468697320697320-     sorted_arr db 10, "This is the array after the sort process completed:", 10,0
-    72 00000129 746865206172726179-
-    72 00000132 206166746572207468-
-    72 0000013B 6520736F7274207072-
-    72 00000144 6F6365737320636F6D-
-    72 0000014D 706C657465643A0A00 
-    73                                  
-    74                                  
-    75                                  segment .bss 
-    76                                  
-    77                                  align 64
-    78 00000000 <res 00000340>          backup_storage_area resb 832
-    79 00000340 <res 00000008>          sum_result resq 1 ; reserve space for 1 floating point #
+    64                                  extern output_array
+    65                                  
+    66                                  extern printf
+    67                                  
+    68                                  
+    69                                  segment .data ;intialized data here
+    70                                  
+    71 00000000 0A546869732070726F-     program_msg1 db 10, "This program will manage your arrays of 64-bit floats.", 10,0
+    71 00000009 6772616D2077696C6C-
+    71 00000012 206D616E6167652079-
+    71 0000001B 6F7572206172726179-
+    71 00000024 73206F662036342D62-
+    71 0000002D 697420666C6F617473-
+    71 00000036 2E0A00             
+    72 00000039 0A466F722074686520-     program_msg2 db 10, "For the array enter a sequence of 64-bit floats seperated by white space.", 10,0
+    72 00000042 617272617920656E74-
+    72 0000004B 657220612073657175-
+    72 00000054 656E6365206F662036-
+    72 0000005D 342D62697420666C6F-
+    72 00000066 617473207365706572-
+    72 0000006F 617465642062792077-
+    72 00000078 686974652073706163-
+    72 00000081 652E0A00           
+    73 00000085 416674657220746865-     program_msg3 db "After the last input press enter followed by Control+D:", 10,0
+    73 0000008E 206C61737420696E70-
+    73 00000097 757420707265737320-
+    73 000000A0 656E74657220666F6C-
+    73 000000A9 6C6F77656420627920-
+    73 000000B2 436F6E74726F6C2B44-
+    73 000000BB 3A0A00             
+    74 000000BE 0A5468657365206E75-     values_stored_in_arr db 10, "These numbers were received and placed into an array", 10,0
+    74 000000C7 6D6265727320776572-
+    74 000000D0 652072656365697665-
+    74 000000D9 6420616E6420706C61-
+    74 000000E2 63656420696E746F20-
+    74 000000EB 616E2061727261790A-
+    74 000000F4 00                 
+    75 000000F5 0A5468652073756D20-     sum_of_arr db 10, "The sum of the inputted numbers is %.9lf", 10,0
+    75 000000FE 6F662074686520696E-
+    75 00000107 707574746564206E75-
+    75 00000110 6D6265727320697320-
+    75 00000119 252E396C660A00     
+    76 00000120 0A5468697320697320-     sorted_arr db 10, "This is the array after the sort process completed:", 10,0
+    76 00000129 746865206172726179-
+    76 00000132 206166746572207468-
+    76 0000013B 6520736F7274207072-
+    76 00000144 6F6365737320636F6D-
+    76 0000014D 706C657465643A0A00 
+    77                                  
+    78                                  
+    79                                  segment .bss ;Declare pointers to un-intialized space here
     80                                  
-    81 00000348 <res 000000A0>          my_array resq 20
-    82                                  
-    83                                  
-    84                                  segment .text
-    85                                  
-    86                                  manager:
+    81                                  align 64
+    82 00000000 <res 00000340>          backup_storage_area resb 832
+    83 00000340 <res 00000008>          sum_result resq 1 ; reserve space for 1 floating point #
+    84                                  
+    85 00000348 <res 000000A0>          my_array resq 20 ; array for floating point #'s
+    86                                  
     87                                  
-    88                                  ;backup GPRs
-    89 00000000 55                      push rbp
-    90 00000001 4889E5                  mov rbp, rsp
-    91 00000004 53                      push rbx
-    92 00000005 51                      push rcx
-    93 00000006 52                      push rdx
-    94 00000007 57                      push rdi
-    95 00000008 56                      push rsi
-    96 00000009 4150                    push r8
-    97 0000000B 4151                    push r9
-    98 0000000D 4152                    push r10
-    99 0000000F 4153                    push r11
-   100 00000011 4154                    push r12
-   101 00000013 4155                    push r13
-   102 00000015 4156                    push r14
-   103 00000017 4157                    push r15
-   104 00000019 9C                      pushf
-   105                                  
-   106                                  ;backup other registers
-   107 0000001A B807000000              mov rax,7
-   108 0000001F BA00000000              mov rdx,0
-   109 00000024 0FAE2425[00000000]      xsave [backup_storage_area]
-   110                                  
-   111                                  
-   112                                  ;Print the purpose of the program
-   113 0000002C B800000000              mov rax, 0
-   114 00000031 48BF-                   mov rdi, program_msg1
-   114 00000033 [0000000000000000] 
-   115 0000003B E8(00000000)            call printf
-   116                                  
-   117                                  ;Print first part of program input prompt
-   118 00000040 B800000000              mov rax, 0
-   119 00000045 48BF-                   mov rdi, program_msg2
-   119 00000047 [3900000000000000] 
-   120 0000004F E8(00000000)            call printf
-   121                                  
-   122                                  ;Print second part of program input prompt
-   123 00000054 B800000000              mov rax, 0
-   124 00000059 48BF-                   mov rdi, program_msg3
-   124 0000005B [8500000000000000] 
-   125 00000063 E8(00000000)            call printf
-   126                                  
-   127                                  
-   128                                  ;Call input array
-   129 00000068 48BF-                   mov rdi, my_array
-   129 0000006A [4803000000000000] 
-   130 00000072 BE14000000              mov rsi, 20
-   131 00000077 E8(00000000)            call input_array
-   132                                  
-   133                                  ;Store the size of the array from input_array in non-volatile register to use for other functions.
-   134 0000007C 4989C5                  mov r13, rax
-   135                                  
-   136                                  ;Print values stored in arr
-   137 0000007F B800000000              mov rax, 0
-   138 00000084 48BF-                   mov rdi, values_stored_in_arr
-   138 00000086 [BE00000000000000] 
-   139 0000008E E8(00000000)            call printf
-   140                                  
-   141                                  
-   142                                  ;Call output array to loop through the values in my_array and display them.
-   143 00000093 48BF-                   mov rdi, my_array
-   143 00000095 [4803000000000000] 
-   144 0000009D 4C89EE                  mov rsi, r13 ; tells output_array how many elements it should print
-   145 000000A0 E8(00000000)            call output_array
-   146                                  
-   147                                  
-   148                                  ;Call the sum function
-   149 000000A5 48BF-                   mov rdi, my_array
-   149 000000A7 [4803000000000000] 
-   150 000000AF 4C89EE                  mov rsi, r13
-   151 000000B2 E8(00000000)            call sum
-   152                                  
-   153 000000B7 660FD60425-             movq [sum_result], xmm0 ; load value xmm0 from sum function into memory location sum_result
-   153 000000BC [40030000]         
-   154                                  
-   155                                  ;Print sum_of_arr and display the result
-   156 000000C0 48BF-                   mov rdi, sum_of_arr
-   156 000000C2 [F500000000000000] 
-   157 000000CA F20F100425-             movsd xmm0, [sum_result]
-   157 000000CF [40030000]         
-   158 000000D3 B801000000              mov rax, 1 
-   159 000000D8 E8(00000000)            call printf
-   160                                  
-   161                                  
-   162                                  ;Call the sort function
-   163 000000DD 48BF-                   mov rdi, my_array
-   163 000000DF [4803000000000000] 
-   164 000000E7 4C89EE                  mov rsi, r13
-   165 000000EA E8(00000000)            call sort
-   166                                  
-   167                                  ;Print message about the sorted array
-   168 000000EF B800000000              mov rax, 0
-   169 000000F4 48BF-                   mov rdi, sorted_arr
-   169 000000F6 [2001000000000000] 
-   170 000000FE E8(00000000)            call printf
-   171                                  
-   172                                  ;Call output array to print each value in the sorted array
-   173 00000103 48BF-                   mov rdi, my_array
-   173 00000105 [4803000000000000] 
-   174 0000010D 4C89EE                  mov rsi, r13
-   175 00000110 E8(00000000)            call output_array
-   176                                  
-   177 00000115 F20F100425-             movsd xmm0, [sum_result] ; load sum back into xmm0
-   177 0000011A [40030000]         
-   178                                  
-   179                                  
-   180                                  ;Restore the GPRs
-   181 0000011E 9D                      popf
-   182 0000011F 415F                    pop r15
-   183 00000121 415E                    pop r14
-   184 00000123 415D                    pop r13
-   185 00000125 415C                    pop r12
-   186 00000127 415B                    pop r11
-   187 00000129 415A                    pop r10
-   188 0000012B 4159                    pop r9
-   189 0000012D 4158                    pop r8
-   190 0000012F 5E                      pop rsi
-   191 00000130 5F                      pop rdi
-   192 00000131 5A                      pop rdx
-   193 00000132 59                      pop rcx
-   194 00000133 5B                      pop rbx
-   195 00000134 5D                      pop rbp   ;Restore rbp to the base of the activation record of the caller program
-   196 00000135 C3                      ret
-   197                                  ;End of the function manager ====================================================================
+    88                                  segment .text
+    89                                  
+    90                                  manager:
+    91                                  
+    92                                  ;backup GPRs
+    93 00000000 55                      push rbp
+    94 00000001 4889E5                  mov rbp, rsp
+    95 00000004 53                      push rbx
+    96 00000005 51                      push rcx
+    97 00000006 52                      push rdx
+    98 00000007 57                      push rdi
+    99 00000008 56                      push rsi
+   100 00000009 4150                    push r8
+   101 0000000B 4151                    push r9
+   102 0000000D 4152                    push r10
+   103 0000000F 4153                    push r11
+   104 00000011 4154                    push r12
+   105 00000013 4155                    push r13
+   106 00000015 4156                    push r14
+   107 00000017 4157                    push r15
+   108 00000019 9C                      pushf
+   109                                  
+   110                                  ;backup other registers
+   111 0000001A B807000000              mov rax,7
+   112 0000001F BA00000000              mov rdx,0
+   113 00000024 0FAE2425[00000000]      xsave [backup_storage_area]
+   114                                  
+   115                                  
+   116                                  ;Print the purpose of the program
+   117 0000002C B800000000              mov rax, 0
+   118 00000031 48BF-                   mov rdi, program_msg1
+   118 00000033 [0000000000000000] 
+   119 0000003B E8(00000000)            call printf
+   120                                  
+   121                                  ;Print first part of program input prompt
+   122 00000040 B800000000              mov rax, 0
+   123 00000045 48BF-                   mov rdi, program_msg2
+   123 00000047 [3900000000000000] 
+   124 0000004F E8(00000000)            call printf
+   125                                  
+   126                                  ;Print second part of program input prompt
+   127 00000054 B800000000              mov rax, 0
+   128 00000059 48BF-                   mov rdi, program_msg3
+   128 0000005B [8500000000000000] 
+   129 00000063 E8(00000000)            call printf
+   130                                  
+   131                                  
+   132                                  ;Call input array
+   133 00000068 48BF-                   mov rdi, my_array
+   133 0000006A [4803000000000000] 
+   134 00000072 BE14000000              mov rsi, 20
+   135 00000077 E8(00000000)            call input_array
+   136                                  
+   137                                  ;Store the size of the array from input_array in non-volatile register to use for other functions.
+   138 0000007C 4989C5                  mov r13, rax
+   139                                  
+   140                                  ;Print values stored in arr
+   141 0000007F B800000000              mov rax, 0
+   142 00000084 48BF-                   mov rdi, values_stored_in_arr
+   142 00000086 [BE00000000000000] 
+   143 0000008E E8(00000000)            call printf
+   144                                  
+   145                                  
+   146                                  ;Call output array to loop through the values in my_array and display them.
+   147 00000093 48BF-                   mov rdi, my_array
+   147 00000095 [4803000000000000] 
+   148 0000009D 4C89EE                  mov rsi, r13 ; tells output_array how many elements it should print
+   149 000000A0 E8(00000000)            call output_array
+   150                                  
+   151                                  
+   152                                  ;Call the sum function
+   153 000000A5 48BF-                   mov rdi, my_array
+   153 000000A7 [4803000000000000] 
+   154 000000AF 4C89EE                  mov rsi, r13
+   155 000000B2 E8(00000000)            call sum
+   156                                  
+   157 000000B7 660FD60425-             movq [sum_result], xmm0 ; load value xmm0 from sum function into  sum_result
+   157 000000BC [40030000]         
+   158                                  
+   159                                  ;Print sum_of_arr and display the result
+   160 000000C0 48BF-                   mov rdi, sum_of_arr
+   160 000000C2 [F500000000000000] 
+   161 000000CA F20F100425-             movsd xmm0, [sum_result]
+   161 000000CF [40030000]         
+   162 000000D3 B801000000              mov rax, 1 
+   163 000000D8 E8(00000000)            call printf
+   164                                  
+   165                                  
+   166                                  ;Call the sort function
+   167 000000DD 48BF-                   mov rdi, my_array
+   167 000000DF [4803000000000000] 
+   168 000000E7 4C89EE                  mov rsi, r13
+   169 000000EA E8(00000000)            call sort
+   170                                  
+   171                                  ;Print message about the sorted array
+   172 000000EF B800000000              mov rax, 0
+   173 000000F4 48BF-                   mov rdi, sorted_arr
+   173 000000F6 [2001000000000000] 
+   174 000000FE E8(00000000)            call printf
+   175                                  
+   176                                  ;Call output array to print each value in the sorted array
+   177 00000103 48BF-                   mov rdi, my_array
+   177 00000105 [4803000000000000] 
+   178 0000010D 4C89EE                  mov rsi, r13
+   179 00000110 E8(00000000)            call output_array
+   180                                  
+   181                                  ; load sum back into xmm0 for printing the value
+   182 00000115 F20F100425-             movsd xmm0, [sum_result] 
+   182 0000011A [40030000]         
+   183                                  
+   184                                  
+   185                                  ;Restore the GPRs
+   186 0000011E 9D                      popf
+   187 0000011F 415F                    pop r15
+   188 00000121 415E                    pop r14
+   189 00000123 415D                    pop r13
+   190 00000125 415C                    pop r12
+   191 00000127 415B                    pop r11
+   192 00000129 415A                    pop r10
+   193 0000012B 4159                    pop r9
+   194 0000012D 4158                    pop r8
+   195 0000012F 5E                      pop rsi
+   196 00000130 5F                      pop rdi
+   197 00000131 5A                      pop rdx
+   198 00000132 59                      pop rcx
+   199 00000133 5B                      pop rbx
+   200 00000134 5D                      pop rbp   ;Restore rbp to the base of the activation record of the caller program
+   201 00000135 C3                      ret
+   202                                  ;End of the function manager ====================================================================

@@ -33,6 +33,10 @@
 ;  This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, and displays the sum of the numbers,
 ;  and sorts the array and displays it.
 ;
+;Devlopment
+;  This assembly code was developed using NASM in a Linux-based enviorment within Github Codespaces,
+;  accessed remotely from a Windows 10 system.  
+;
 ;This file:
 ;  File name: input_array.asm
 ;  Language: X86-64

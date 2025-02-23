@@ -25,6 +25,10 @@
 
 //Purpose of this program: This program takes floating point number inputs from the user and puts them in an array. The array values are then printed, along with the variance of the numbers.
 //  
+//Devlopment
+//  This C++ code was developed in a Linux-based enviorment within Github Codespaces,
+//  accessed remotely from a Windows 10 system.  
+//
 //This file
 //  File name: main.cpp
 //  Language: C++ language, 202x standardization where x will be a decimal digit.
@@ -43,12 +47,15 @@ extern "C" double manager();
 
 int main(void)
 {
+ //print welcome message to user
  printf("\nWelcome to Arrays of Floating Point Numbers.\n");
  printf("\nBrought to you by Carlos Secas\n");
  
+ // call the manager function
  double count = 0;
  count = manager();
  
+ //print the final result of the program before ending the program
  printf("\nMain has received %.10lf and will keep it for future use.\n",count);
- printf("\nMain will return 0 to the operating system. Bye.\n");
+ printf("\nMain will return 0 to the operating system. Bye.\n\n");
 }
